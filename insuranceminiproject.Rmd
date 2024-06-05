@@ -1,0 +1,97 @@
+---
+title: "Demographic Breakdown"
+output: html_notebook
+---
+
+
+```{r}
+#libraries
+library(tidyverse)
+library(ggplot2)
+library(dplyr)
+library(caret)
+library(randomForest)
+library(ggthemes)
+```
+
+```{r}
+insurance_data <- read_csv("insurance1.csv") 
+view(insurance_data)
+```
+```{r}
+ggplot(
+  data = insurance_data,
+  mapping = aes(x = age, y = charges)
+) +
+  geom_point(aes(color = smoker, shape = smoker)) +
+  geom_smooth(method = "lm") +
+  labs(
+    title = "Age vs, Charges",
+    subtitle = "Comparison between age and the amount of premium charged",
+    x = "age in years", y = "charge in dollars",
+    color = "sex", shape = "sex"
+  ) 
+ 
+```
+
+```{r}
+#Gives summary of the data
+head(insurance_data)
+summary(insurance_data)
+```
+```{r}
+#converts the variables as factors and numeric factors
+insurance_data$age <- as.numeric(insurance_data$age)
+insurance_data$bmi <- as.numeric(insurance_data$bmi)
+insurance_data$children <- as.numeric(insurance_data$children)
+insurance_data$charges <- as.numeric(insurance_data$charges)
+insurance_data$sex <- as.factor(insurance_data$sex)
+insurance_data$smoker <- as.factor(insurance_data$smoker)
+insurance_data$region <- as.factor(insurance_data$region)
+
+```
+
+```{r}
+#Splits the data into training data and testing data
+set.seed(123)
+train_index <- sample(seq_len(nrow(insurance_data)), size = 0.8*nrow(insurance_data))
+train_data <- insurance_data[train_index, ]
+test_data <- insurance_data[-train_index, ]
+
+```
+
+
+```{r}
+#linear regression
+model <- lm(charges ~ ., data = train_data)
+
+
+```
+
+```{r}
+  # Load the new data for prediction
+  new_data <- read.csv("insurance - Copy.csv")
+```
+
+
+```{r}
+  # Preprocess the new data 
+  new_data$age <- as.numeric(new_data$age)
+  new_data$sex <- as.factor(new_data$sex)
+  new_data$bmi <- as.numeric(new_data$bmi)
+  new_data$children <- as.numeric(new_data$children)
+  new_data$smoker <- as.factor(new_data$smoker)
+  new_data$region <- as.factor(new_data$region)
+```
+
+
+```{r}
+  predictions <- predict(model, newdata = new_data)
+```
+
+```{r}
+print(predictions)
+```
+
+
+
